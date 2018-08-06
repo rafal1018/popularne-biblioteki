@@ -2,6 +2,7 @@ package pl.strefakursow;
 
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import okhttp3.OkHttpClient;
 import org.simpleframework.xml.Serializer;
 
 /**
@@ -13,5 +14,6 @@ public class App {
         System.out.println("Hello World!");
         new Gson();
 //        new Serializer();
+        OkHttpClient client = new OkHttpClient();
     }
 }
