@@ -1,42 +1,38 @@
 package pl.strefakursow;
 
-
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import lombok.extern.java.Log;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import okhttp3.*;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 
 @Log
 public class Main {
     public static void main(String[] vararg) throws Exception {
 
-        List<Cloth> clothList = new ArrayList<>();
-        clothList.add(new Cloth("Green", true));
-        clothList.add(new Cloth("Red", false));
-        ExampleModel exampleModel = new ExampleModel();
-        exampleModel.setHairColor("Blond");
-        exampleModel.setHeight(190);
-        exampleModel.setAge(4);
-        exampleModel.setCloths(clothList);
-        ExampleModel exampleModel2 = new ExampleModel();
-        exampleModel2.setHairColor("Blond");
-        exampleModel2.setHeight(1902);
-        exampleModel2.setMale(true);
-        exampleModel2.setAge(42);
+        OkHttpClient client = new OkHttpClient();
 
-        List<ExampleModel> listOld = Arrays.asList(exampleModel, exampleModel2);
+        final Request request = new Request.Builder()
+                .url("http://www.json-generator.com/api/json/get/bUjOtRBGTC?indent=2")
+                .build();
 
-        Serializer serializer = new Persister();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.info(e.toString());
+            }
 
-        File out = new File("example.xml");
-        serializer.write(exampleModel, out);
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String json = response.body().string();
+                Type type = new TypeToken<List<Cloth>>() {}.getType();
+                List<Cloth> cloths = new Gson().fromJson(json, type);
+                log.info(cloths.get(0).toString());
+            }
+        });
 
-        ExampleModel exampleModelread = serializer.read(ExampleModel.class, out);
-
-        log.info(String.valueOf(exampleModelread.equals(exampleModel)));
+        log.info("Koniec bloku");
     }
 }
